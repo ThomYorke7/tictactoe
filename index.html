@@ -17,16 +17,40 @@
 
 
     <div id="game-container">
-        <div id="game-info">
-            <div id="player1-info">
-                <span id="player1-name">Player 1:</span>
-                <span id="player1-score">0</span>
-            </div>
-            <div id="player2-info">
-                <span id="player2-name">Player 2:</span>
-                <span id="player2-score">0</span>
-            </div>
+
+        <div id="form-container">
+            <form id="form">
+                <div id="player1name-container">
+                    <label for="player1name-input">Player 1 Name:</label>
+                    <input type="text" id="player1name-input">
+                </div>
+                <div id="player2name-container">
+                    <label for="player2name-input">Player 2 Name:</label>
+                    <input type="text" id="player2name-input">
+                </div>
+                <div id="gametype">
+                    <label class="button" for="game-type">Single Player
+                        <input id="game-type" name="game-type" type="radio" value="singleplayer"></label>
+                    <label class="button" for="game-type">Multiplayer
+                        <input id="game-type" name="game-type" type="radio" value="multiplayer"></label>
+
+                </div>
+                <div id="startgame">
+                    <button type="submit">Start</button>
+                </div>
+            </form>
         </div>
+
+
+        <div id="player1-info">
+            <span id="player1-name">Player 1:</span>
+            <span id="player1-score">0</span>
+        </div>
+        <div id="player2-info">
+            <span id="player2-name">Player 2:</span>
+            <span id="player2-score">0</span>
+        </div>
+
 
         <div id="gameboard-container">
             <div data-row="1" data-col="1" data-diag="1" class="box"></div>
@@ -39,9 +63,12 @@
             <div data-row="3" data-col="2" data-diag="0" class="box"></div>
             <div data-row="3" data-col="3" data-diag="1" class="box"></div>
         </div>
-
     </div>
 
+    <div id="buttons-container">
+        <button id="new-game">New Game</button>
+        <button id="reset">Reset</button>
+    </div>
 
     <script type="text/javascript" src="./script.js"></script>
 </body>
