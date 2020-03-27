@@ -25,24 +25,6 @@ let playerTwo = playerFactory(document.getElementById("player2-name").textConten
 
 
 
-const emptyBoard = () => {
-    const boxes = document.getElementsByClassName("box");
-    for (box of boxes) {
-        box.textContent = ""
-    }
-}
-
-document.getElementById("new-game").addEventListener("click", () => {
-    document.getElementById("form-container").style.display = "block";
-    emptyBoard();
-})
-
-
-/* QUESTO VA SPOSTATO ALTROVE POICHE DEVE SVUOTARE ANCHE I VALORI DI ROWS */
-document.getElementById("reset").addEventListener("click", emptyBoard)
-
-
-
 
 const gameboard = (() => {
 
@@ -50,8 +32,15 @@ const gameboard = (() => {
     const checkVictory = (player) => {
         Object.values(rows).forEach(array => {
             if (array.length == 3 && new Set(array).size == 1) {
-                console.log("You won")
+                document.getElementById("gameboard-container").style.pointerEvents = "none"
                 player.score++
+                if (player.selector == "X") {
+                    document.getElementById("player1-score").textContent = player.score;
+                } else {
+                    document.getElementById("player2-score").textContent = player.score;
+                }
+                setTimeout(emptyBoard, 2000)
+                setTimeout(() => { document.getElementById("gameboard-container").style.pointerEvents = "auto" }, 2000)
             }
         })
     }
@@ -118,6 +107,19 @@ const gameboard = (() => {
         populateDiagonals(selector, diag);
     }
 
+
+    const emptyBoard = () => {
+        const boxes = document.getElementsByClassName("box");
+        for (box of boxes) {
+            box.textContent = ""
+        }
+        Object.values(rows).forEach(arr => {
+            arr.length = 0
+        })
+    }
+
+    document.getElementById("reset").addEventListener("click", emptyBoard)
+
     const fillBox = (() => {
         const boxes = document.getElementsByClassName("box");
         for (box of boxes) {
@@ -144,7 +146,7 @@ const gameboard = (() => {
         }
     }
 
-    return { fillBox }
+    return { fillBox, emptyBoard }
 
 })()
 
@@ -153,10 +155,23 @@ for (item of document.getElementsByClassName("box")) {
 }
 
 
+document.getElementById("new-game").addEventListener("click", () => {
+    document.getElementById("form-container").style.display = "block";
+    playerOne.score = 0;
+    playerTwo.score = 0;
+    document.getElementById("player1-score").textContent = playerOne.score;
+    document.getElementById("player2-score").textContent = playerTwo.score;
+    gameboard.emptyBoard
+})
+
 /*
-legare player.score a html
-azzerare rows quando emptyRows o newGame
-bloccare partita quando si vince/pareggia
-oppure mettere setInterval e azzerare la griglia dopo tot secondi
+legare player.score a html [X]
+azzerare rows quando emptyRows [X]
+azzerare rows e punteggio quando newGame [X]
+bloccare partita quando si vince [X]
+bloccare partita quando si pareggia
 aggiungere pareggio sotto i due playerscore
+aggiungere AI
+modificare form quando si seleziona single player/multiplayer
+modificare grafica sito
 */
