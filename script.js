@@ -9,17 +9,35 @@ const newGame = playerForm.addEventListener("submit", (e) => {
     e.preventDefault()
     let playerOneName = document.getElementById("player1name-input").value;
     let playerTwoName = document.getElementById("player2name-input").value;
-    let gameMode = document.getElementById("game-type").value;
+    let gameMode = document.querySelector('input[type="radio"]:checked')
 
     document.getElementById("player1-name").textContent = playerOneName;
     document.getElementById("player2-name").textContent = playerTwoName;
 
     document.getElementById("form-container").style.display = "none"
 
+    if (gameMode.value == "multiplayer") {
+        for (item of document.getElementsByClassName("box")) {
+            item.addEventListener("click", gameboard.fillBoxSingle())
+        }
+    }
+
 })
 
 let playerOne = playerFactory(document.getElementById("player1-name").textContent, "X", true, 0)
 let playerTwo = playerFactory(document.getElementById("player2-name").textContent, "O", false, 0)
+
+
+
+
+document.getElementById("new-game").addEventListener("click", () => {
+    document.getElementById("form-container").style.display = "block";
+    playerOne.score = 0;
+    playerTwo.score = 0;
+    document.getElementById("player1-score").textContent = playerOne.score;
+    document.getElementById("player2-score").textContent = playerTwo.score;
+    gameboard.emptyBoard
+})
 
 
 
@@ -41,8 +59,17 @@ const gameboard = (() => {
                 }
                 setTimeout(emptyBoard, 2000)
                 setTimeout(() => { document.getElementById("gameboard-container").style.pointerEvents = "auto" }, 2000)
+            } else {
+                checkTie()
             }
         })
+    }
+
+
+    const checkTie = () => {
+        if (Object.values(rows).every(i => i.length == 3)) {
+            setTimeout(emptyBoard, 2000)
+        }
     }
 
     const rows = {
@@ -120,7 +147,130 @@ const gameboard = (() => {
 
     document.getElementById("reset").addEventListener("click", emptyBoard)
 
-    const fillBox = (() => {
+
+    const computerTurn = (() => {
+
+        const randomMove = () => {
+            const boxes = document.getElementsByClassName("box");
+            let index = Math.floor((Math.random() * 9));
+            if (!boxes[index].textContent) {
+                boxes[index].textContent = "O";
+                populateTable("O", ...Object.values(boxes[index].dataset))
+            } else {
+                index = Math.floor((Math.random() * 9));
+                boxes[index].textContent = "O";
+                populateTable("O", ...Object.values(boxes[index].dataset))
+            }
+        }
+
+        const smartMove = (position) => {
+            console.log("smartmove")
+            let lines = document.querySelectorAll(position)
+            Object.values(lines).forEach(box => {
+                if (!box.textContent) {
+                    box.textContent = "O"
+                    populateTable("O", ...Object.values(box.dataset))
+                }
+            })
+        }
+
+        const checkRows = () => {
+            console.log("checkrows")
+            Object.entries(rows).some(([key, array]) => {
+                if (array.length == 2 && new Set(array).size == 1) {
+                    switch (key) {
+                        case "rowOne":
+                            smartMove("[data-row='1']")
+                            break;
+                        case "rowTwo":
+                            smartMove("[data-row='2']")
+                            break;
+                        case "rowThree":
+                            smartMove("[data-row='3']")
+                            break;
+                        case "colOne":
+                            smartMove("[data-col='1']")
+                            break;
+                        case "colTwo":
+                            smartMove("[data-col='2']")
+                            break;
+                        case "colThree":
+                            smartMove("[data-col='3']")
+                            break;
+                        case "diagOne":
+                            smartMove("[data-diag='1']")
+                            break;
+                        case "diagTwo":
+                            smartMove("[data-row='2']")
+                            break;
+                    }
+                } else if (array.length == 1 && array[0] == "O") {
+                    switch (key) {
+                        case "rowOne":
+                            smartMove("[data-row='1']")
+                            break;
+                        case "rowTwo":
+                            smartMove("[data-row='2']")
+                            break;
+                        case "rowThree":
+                            smartMove("[data-row='3']")
+                            break;
+                        case "colOne":
+                            smartMove("[data-col='1']")
+                            break;
+                        case "colTwo":
+                            smartMove("[data-col='2']")
+                            break;
+                        case "colThree":
+                            smartMove("[data-col='3']")
+                            break;
+                        case "diagOne":
+                            smartMove("[data-diag='1']")
+                            break;
+                        case "diagTwo":
+                            smartMove("[data-row='2']")
+                            break;
+                    }
+                }
+            })
+        }
+
+        const computerChoice = () => {
+            const boxes = document.getElementsByClassName("box");
+            let total = 0;
+            Object.values(boxes).forEach(box => {
+                if (!box.textContent) {
+                    total += 1
+                }
+            })
+            if (total > 6) {
+                randomMove();
+            } else {
+                checkRows()
+            }
+        }
+
+        return { computerChoice }
+
+    })()
+
+
+    const fillBoxSingle = () => {
+        const boxes = document.getElementsByClassName("box");
+        for (box of boxes) {
+            box.addEventListener("click", (e) => {
+                if (!e.target.textContent) {
+                    e.target.textContent = "X";
+                    populateTable(e.target.textContent, ...Object.values(e.target.dataset))
+                    computerTurn.computerChoice()
+                    //checkVictory(player);
+                }
+            })
+        }
+    }
+
+
+    const fillBox = () => {
         const boxes = document.getElementsByClassName("box");
         for (box of boxes) {
             box.addEventListener("click", (e) => {
@@ -132,46 +282,42 @@ const gameboard = (() => {
                 }
             })
         }
-    })()
+    }
 
     const swapPlayers = () => {
         if (playerOne.turn === true) {
-            playerTwo.turn = true;
             playerOne.turn = false;
             return playerOne
         } else {
             playerOne.turn = true;
-            playerTwo.turn = false;
             return playerTwo
         }
     }
 
-    return { fillBox, emptyBoard }
+
+    return { fillBoxSingle, emptyBoard, computerTurn, rows }
 
 })()
 
-for (item of document.getElementsByClassName("box")) {
-    item.addEventListener("click", gameboard.fillBox)
-}
 
 
-document.getElementById("new-game").addEventListener("click", () => {
-    document.getElementById("form-container").style.display = "block";
-    playerOne.score = 0;
-    playerTwo.score = 0;
-    document.getElementById("player1-score").textContent = playerOne.score;
-    document.getElementById("player2-score").textContent = playerTwo.score;
-    gameboard.emptyBoard
-})
+
+
+
+
+
+
+
 
 /*
 legare player.score a html [X]
 azzerare rows quando emptyRows [X]
 azzerare rows e punteggio quando newGame [X]
 bloccare partita quando si vince [X]
-bloccare partita quando si pareggia
-aggiungere pareggio sotto i due playerscore
+bloccare partita quando si pareggia [X]
+aggiungere pareggio sotto i due playerscore [X]
 aggiungere AI
+Sostituire forEach loop con for loop in computerTurn
 modificare form quando si seleziona single player/multiplayer
 modificare grafica sito
 */
