@@ -1,53 +1,20 @@
-const playerForm = document.getElementById("form")
-
-const playerFactory = (name, selector, turn, score) => {
-    return { name, selector, turn, score }
-}
-
-
-const newGame = playerForm.addEventListener("submit", (e) => {
-    e.preventDefault()
-    let playerOneName = document.getElementById("player1name-input").value;
-    let playerTwoName = document.getElementById("player2name-input").value;
-    let gameMode = document.querySelector('input[type="radio"]:checked')
-
-    document.getElementById("player1-name").textContent = playerOneName;
-    document.getElementById("player2-name").textContent = playerTwoName;
-
-    document.getElementById("form-container").style.display = "none"
-
-    if (gameMode.value == "multiplayer") {
-        for (item of document.getElementsByClassName("box")) {
-            item.addEventListener("click", gameboard.fillBoxSingle())
-        }
-    }
-
-})
-
-let playerOne = playerFactory(document.getElementById("player1-name").textContent, "X", true, 0)
-let playerTwo = playerFactory(document.getElementById("player2-name").textContent, "O", false, 0)
-
-
-
-
-document.getElementById("new-game").addEventListener("click", () => {
-    document.getElementById("form-container").style.display = "block";
-    playerOne.score = 0;
-    playerTwo.score = 0;
-    document.getElementById("player1-score").textContent = playerOne.score;
-    document.getElementById("player2-score").textContent = playerTwo.score;
-    gameboard.emptyBoard()
-})
-
-
-
-
-
-
 const gameboard = (() => {
 
+    const boxes = document.getElementsByClassName("box");
+
+    const rows = {
+        rowOne: [],
+        rowTwo: [],
+        rowThree: [],
+        colOne: [],
+        colTwo: [],
+        colThree: [],
+        diagOne: [],
+        diagTwo: []
+    }
 
     const checkVictory = (player) => {
+        let victory = false
         Object.values(rows).forEach(array => {
             if (array.length == 3 && new Set(array).size == 1) {
                 document.getElementById("gameboard-container").style.pointerEvents = "none"
@@ -59,28 +26,18 @@ const gameboard = (() => {
                 }
                 setTimeout(emptyBoard, 2000)
                 setTimeout(() => { document.getElementById("gameboard-container").style.pointerEvents = "auto" }, 2000)
+                victory = true
             } else {
                 checkTie()
             }
         })
+        return { victory }
     }
-
 
     const checkTie = () => {
         if (Object.values(rows).every(i => i.length == 3)) {
             setTimeout(emptyBoard, 2000)
         }
-    }
-
-    const rows = {
-        rowOne: [],
-        rowTwo: [],
-        rowThree: [],
-        colOne: [],
-        colTwo: [],
-        colThree: [],
-        diagOne: [],
-        diagTwo: []
     }
 
 
@@ -136,7 +93,6 @@ const gameboard = (() => {
 
 
     const emptyBoard = () => {
-        const boxes = document.getElementsByClassName("box");
         for (box of boxes) {
             box.textContent = ""
         }
@@ -145,13 +101,10 @@ const gameboard = (() => {
         })
     }
 
-    document.getElementById("reset").addEventListener("click", emptyBoard)
-
 
     const computerTurn = (() => {
 
         const randomMove = () => {
-            const boxes = document.getElementsByClassName("box");
             let index = Math.floor((Math.random() * 9));
             if (!boxes[index].textContent) {
                 boxes[index].textContent = "O";
@@ -218,7 +171,7 @@ const gameboard = (() => {
             const move = checkMatchpoint()
             if (move == 0) {
                 Object.entries(rows).some(([key, array]) => {
-                    if (array.length >= 1 && array.includes("O")) {
+                    if ((array.length == 1 || array.length == 2) && array.includes("O")) {
                         switch (key) {
                             case "rowOne":
                                 smartMove("[data-row='1']")
@@ -244,8 +197,6 @@ const gameboard = (() => {
                             case "diagTwo":
                                 smartMove("[data-row='2']")
                                 return true;
-                            default:
-                                return true
                         }
                     }
                 })
@@ -254,7 +205,6 @@ const gameboard = (() => {
 
 
         const computerChoice = () => {
-            const boxes = document.getElementsByClassName("box");
             let total = 0;
             Object.values(boxes).forEach(box => {
                 if (!box.textContent) {
@@ -274,22 +224,22 @@ const gameboard = (() => {
 
 
     const fillBoxSingle = () => {
-        const boxes = document.getElementsByClassName("box");
         for (box of boxes) {
             box.addEventListener("click", (e) => {
                 if (!e.target.textContent) {
                     e.target.textContent = "X";
                     populateTable(e.target.textContent, ...Object.values(e.target.dataset))
-                    computerTurn.computerChoice()
-                    //checkVictory(player);
+                    if (!checkVictory(playerOne).victory) {
+                        computerTurn.computerChoice()
+                        checkVictory(playerTwo)
+                    }
                 }
             })
         }
     }
 
 
-    const fillBox = () => {
-        const boxes = document.getElementsByClassName("box");
+    const fillBoxMulti = () => {
         for (box of boxes) {
             box.addEventListener("click", (e) => {
                 if (!e.target.textContent) {
@@ -313,30 +263,57 @@ const gameboard = (() => {
     }
 
 
-    return { fillBoxSingle, emptyBoard, computerTurn, rows }
+    return { fillBoxSingle, fillBoxMulti, emptyBoard }
 
 })()
 
 
+const playerFactory = (name, selector, turn, score) => {
+    return { name, selector, turn, score }
+}
+
+let playerOne = playerFactory(document.getElementById("player1-name").textContent, "X", true, 0)
+let playerTwo = playerFactory(document.getElementById("player2-name").textContent, "O", false, 0)
 
 
+const newGame = (() => {
+    document.getElementById("player1name-input").value = ""
+    document.getElementById("player2name-input").value = ""
+    const playerForm = document.getElementById("form")
+    const radioButtons = document.querySelectorAll('input[type="radio"]')
+    for (button of radioButtons) {
+        button.addEventListener("click", () => {
+            if (document.getElementById("multi").checked) {
+                document.getElementById("player2name-container").style.display = "block"
+            } else if (document.getElementById("single").checked) {
+                document.getElementById("player2name-container").style.display = "none"
+            }
+        })
+    }
+
+    playerForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let gameMode = document.querySelector('input[type="radio"]:checked');
+        if (gameMode.value == "singleplayer") {
+            for (item of document.getElementsByClassName("box")) {
+                item.addEventListener("click", gameboard.fillBoxSingle())
+            }
+            document.getElementById("player2name-input").value = "Computer"
+            console.log(document.getElementById("player2name-input").value)
+        } else if (gameMode.value == "multiplayer") {
+            for (item of document.getElementsByClassName("box")) {
+                item.addEventListener("click", gameboard.fillBoxMulti())
+            }
+        }
+        document.getElementById("player1-name").textContent = document.getElementById("player1name-input").value;
+        document.getElementById("player2-name").textContent = document.getElementById("player2name-input").value;
+        document.getElementById("form-container").style.display = "none"
+    })
+})()
 
 
+document.getElementById("new-game").addEventListener("click", () => {
+    window.location.reload();
+})
 
-
-
-
-
-/*
-legare player.score a html [X]
-azzerare rows quando emptyRows [X]
-azzerare rows e punteggio quando newGame [X]
-bloccare partita quando si vince [X]
-bloccare partita quando si pareggia [X]
-aggiungere pareggio sotto i due playerscore [X]
-aggiungere AI [X]
-Sostituire forEach loop con for loop in computerTurn [X]
-rendere computer == player2
-modificare form quando si seleziona single player/multiplayer
-modificare grafica sito
-*/
+document.getElementById("reset").addEventListener("click", gameboard.emptyBoard)

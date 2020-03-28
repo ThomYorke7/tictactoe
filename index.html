@@ -22,7 +22,7 @@
             <form id="form">
                 <div id="player1name-container">
                     <label for="player1name-input">Player 1 Name:</label>
-                    <input type="text" id="player1name-input">
+                    <input type="text" id="player1name-input" required>
                 </div>
                 <div id="player2name-container">
                     <label for="player2name-input">Player 2 Name:</label>
@@ -30,9 +30,9 @@
                 </div>
                 <div id="gametype">
                     <label class="button" for="game-type">Single Player
-                        <input name="game-type" type="radio" value="singleplayer"></label>
+                        <input name="game-type" type="radio" id="single" value="singleplayer"></label>
                     <label class="button" for="game-type">Multiplayer
-                        <input name="game-type" type="radio" value="multiplayer"></label>
+                        <input name="game-type" type="radio" id="multi" value="multiplayer"></label>
 
                 </div>
                 <div id="startgame">
@@ -47,7 +47,7 @@
             <span id="player1-score">0</span>
         </div>
         <div id="player2-info">
-            <span id="player2-name">Player 2:</span>
+            <span id="player2-name">Computer:</span>
             <span id="player2-score">0</span>
         </div>
 
