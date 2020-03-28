@@ -36,7 +36,7 @@ document.getElementById("new-game").addEventListener("click", () => {
     playerTwo.score = 0;
     document.getElementById("player1-score").textContent = playerOne.score;
     document.getElementById("player2-score").textContent = playerTwo.score;
-    gameboard.emptyBoard
+    gameboard.emptyBoard()
 })
 
 
@@ -164,76 +164,94 @@ const gameboard = (() => {
         }
 
         const smartMove = (position) => {
-            console.log("smartmove")
             let lines = document.querySelectorAll(position)
-            Object.values(lines).forEach(box => {
+            Object.values(lines).some(box => {
                 if (!box.textContent) {
                     box.textContent = "O"
                     populateTable("O", ...Object.values(box.dataset))
+                    return true
                 }
             })
         }
 
         const checkRows = () => {
-            console.log("checkrows")
-            Object.entries(rows).some(([key, array]) => {
-                if (array.length == 2 && new Set(array).size == 1) {
-                    switch (key) {
-                        case "rowOne":
-                            smartMove("[data-row='1']")
-                            break;
-                        case "rowTwo":
-                            smartMove("[data-row='2']")
-                            break;
-                        case "rowThree":
-                            smartMove("[data-row='3']")
-                            break;
-                        case "colOne":
-                            smartMove("[data-col='1']")
-                            break;
-                        case "colTwo":
-                            smartMove("[data-col='2']")
-                            break;
-                        case "colThree":
-                            smartMove("[data-col='3']")
-                            break;
-                        case "diagOne":
-                            smartMove("[data-diag='1']")
-                            break;
-                        case "diagTwo":
-                            smartMove("[data-row='2']")
-                            break;
+            const checkMatchpoint = () => {
+                let chance = [0]
+                Object.entries(rows).some(([key, array]) => {
+                    if (array.length == 2 && new Set(array).size == 1) {
+                        switch (key) {
+                            case "rowOne":
+                                smartMove("[data-row='1']")
+                                break;
+                            case "rowTwo":
+                                smartMove("[data-row='2']")
+                                break;
+                            case "rowThree":
+                                smartMove("[data-row='3']")
+                                break;
+                            case "colOne":
+                                smartMove("[data-col='1']")
+                                break;
+                            case "colTwo":
+                                smartMove("[data-col='2']")
+                                break;
+                            case "colThree":
+                                smartMove("[data-col='3']")
+                                break;
+                            case "diagOne":
+                                smartMove("[data-diag='1']")
+                                smartMove("[data-diag='3']")
+                                break;
+                            case "diagTwo":
+                                smartMove("[data-diag='2']")
+                                smartMove("[data-diag='3']")
+                                break;
+                        }
+                        chance.push(1)
+                        return true
+                    } else { chance.push(0) }
+                })
+                return chance[chance.length - 1]
+            }
+
+
+            const move = checkMatchpoint()
+            if (move == 0) {
+                Object.entries(rows).some(([key, array]) => {
+                    if (array.length >= 1 && array.includes("O")) {
+                        switch (key) {
+                            case "rowOne":
+                                smartMove("[data-row='1']")
+                                return true;
+                            case "rowTwo":
+                                smartMove("[data-row='2']")
+                                return true;
+                            case "rowThree":
+                                smartMove("[data-row='3']")
+                                return true;
+                            case "colOne":
+                                smartMove("[data-col='1']")
+                                return true;
+                            case "colTwo":
+                                smartMove("[data-col='2']")
+                                return true;
+                            case "colThree":
+                                smartMove("[data-col='3']")
+                                return true;
+                            case "diagOne":
+                                smartMove("[data-diag='1']")
+                                return true;
+                            case "diagTwo":
+                                smartMove("[data-row='2']")
+                                return true;
+                            default:
+                                return true
+                        }
                     }
-                } else if (array.length == 1 && array[0] == "O") {
-                    switch (key) {
-                        case "rowOne":
-                            smartMove("[data-row='1']")
-                            break;
-                        case "rowTwo":
-                            smartMove("[data-row='2']")
-                            break;
-                        case "rowThree":
-                            smartMove("[data-row='3']")
-                            break;
-                        case "colOne":
-                            smartMove("[data-col='1']")
-                            break;
-                        case "colTwo":
-                            smartMove("[data-col='2']")
-                            break;
-                        case "colThree":
-                            smartMove("[data-col='3']")
-                            break;
-                        case "diagOne":
-                            smartMove("[data-diag='1']")
-                            break;
-                        case "diagTwo":
-                            smartMove("[data-row='2']")
-                            break;
-                    }
-                }
-            })
+                })
+            }
         }
+
 
         const computerChoice = () => {
             const boxes = document.getElementsByClassName("box");
@@ -316,8 +334,9 @@ azzerare rows e punteggio quando newGame [X]
 bloccare partita quando si vince [X]
 bloccare partita quando si pareggia [X]
 aggiungere pareggio sotto i due playerscore [X]
-aggiungere AI
-Sostituire forEach loop con for loop in computerTurn
+aggiungere AI [X]
+Sostituire forEach loop con for loop in computerTurn [X]
+rendere computer == player2
 modificare form quando si seleziona single player/multiplayer
 modificare grafica sito
 */
