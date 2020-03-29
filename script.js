@@ -1,7 +1,10 @@
+// Main Gameboard App
+
 const gameboard = (() => {
 
     const boxes = document.getElementsByClassName("box");
 
+    // The arrays in the object are used to store selectors
     const rows = {
         rowOne: [],
         rowTwo: [],
@@ -13,6 +16,7 @@ const gameboard = (() => {
         diagTwo: []
     }
 
+    // Checks whether there are three identical selectors in one of the grid lines, otherwise calls checkTie()
     const checkVictory = (player) => {
         let victory = false
         Object.values(rows).forEach(array => {
@@ -34,6 +38,8 @@ const gameboard = (() => {
         return { victory }
     }
 
+
+    // Checks whether all the grid lines are full
     const checkTie = () => {
         if (Object.values(rows).every(i => i.length == 3)) {
             setTimeout(emptyBoard, 2000)
@@ -41,6 +47,7 @@ const gameboard = (() => {
     }
 
 
+    // Populates the 'rows' object with the players' selectors
     const populateTable = (selector, row, col, diag) => {
 
         const populateRows = (selector, row) => {
@@ -92,6 +99,7 @@ const gameboard = (() => {
     }
 
 
+    // Empties the board and the 'rows' object
     const emptyBoard = () => {
         for (box of boxes) {
             box.textContent = ""
@@ -102,8 +110,10 @@ const gameboard = (() => {
     }
 
 
+    // Includes the computer logic
     const computerTurn = (() => {
 
+        // Picks a random box and populates it if it's empty
         const randomMove = () => {
             let index = Math.floor((Math.random() * 9));
             if (!boxes[index].textContent) {
@@ -116,6 +126,7 @@ const gameboard = (() => {
             }
         }
 
+        // Populates the rows indicated by the position parameter
         const smartMove = (position) => {
             let lines = document.querySelectorAll(position)
             Object.values(lines).some(box => {
@@ -127,6 +138,7 @@ const gameboard = (() => {
             })
         }
 
+        // Checks if there are lines with two of the same selector, and returns the chance to win or block the player
         const checkRows = () => {
             const checkMatchpoint = () => {
                 let chance = [0]
@@ -167,7 +179,7 @@ const gameboard = (() => {
                 return chance[chance.length - 1]
             }
 
-
+            // Calls checkRows and if there are no chance to win or block the player, fills one line
             const move = checkMatchpoint()
             if (move == 0) {
                 Object.entries(rows).some(([key, array]) => {
@@ -203,7 +215,7 @@ const gameboard = (() => {
             }
         }
 
-
+        // Counts the empty boxes and calls randomMove or checkRows based on the quantity
         const computerChoice = () => {
             let total = 0;
             Object.values(boxes).forEach(box => {
@@ -222,7 +234,7 @@ const gameboard = (() => {
 
     })()
 
-
+    // Fills the grid with the player choice, calls the computer logic and checks for victory
     const fillBoxSingle = () => {
         for (box of boxes) {
             box.addEventListener("click", (e) => {
@@ -238,7 +250,7 @@ const gameboard = (() => {
         }
     }
 
-
+    // Fills the grid with the two players' choices and checks for victory
     const fillBoxMulti = () => {
         for (box of boxes) {
             box.addEventListener("click", (e) => {
@@ -252,6 +264,7 @@ const gameboard = (() => {
         }
     }
 
+    // Feeds the right player to fillBoxMulti()
     const swapPlayers = () => {
         if (playerOne.turn === true) {
             playerOne.turn = false;
@@ -268,6 +281,7 @@ const gameboard = (() => {
 })()
 
 
+// Players Creation
 const playerFactory = (name, selector, turn, score) => {
     return { name, selector, turn, score }
 }
@@ -276,6 +290,7 @@ let playerOne = playerFactory(document.getElementById("player1-name").textConten
 let playerTwo = playerFactory(document.getElementById("player2-name").textContent, "O", false, 0)
 
 
+// New Game Creation
 const newGame = (() => {
     document.getElementById("player1name-input").value = ""
     document.getElementById("player2name-input").value = ""
@@ -291,6 +306,7 @@ const newGame = (() => {
         })
     }
 
+    // Grabs the form inputs
     playerForm.addEventListener("submit", (e) => {
         e.preventDefault();
         let gameMode = document.querySelector('input[type="radio"]:checked');
@@ -299,7 +315,6 @@ const newGame = (() => {
                 item.addEventListener("click", gameboard.fillBoxSingle())
             }
             document.getElementById("player2name-input").value = "Computer"
-            console.log(document.getElementById("player2name-input").value)
         } else if (gameMode.value == "multiplayer") {
             for (item of document.getElementsByClassName("box")) {
                 item.addEventListener("click", gameboard.fillBoxMulti())
@@ -312,6 +327,7 @@ const newGame = (() => {
 })()
 
 
+// Buttons Settings
 document.getElementById("new-game").addEventListener("click", () => {
     window.location.reload();
 })

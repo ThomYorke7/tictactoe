@@ -1,3 +1,4 @@
+/* Global Variables */
 @import url('https://fonts.googleapis.com/css2?family=Schoolbell&display=swap');
 
 :root {
@@ -8,20 +9,24 @@
 html, body {
     width: 100%;
     height: 100%;
+    background-color: #fff8f0;
+    background-image: url(../images/chalkboard.jpg);
+    color: antiquewhite;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     margin-top: 1rem;
     font-size: 3rem;
 }
 
+
+/* Form Settings */
 #form-container {
     position: absolute;
-    width: 100%;
+    width: 50%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.9);
 }
 
 #form {
@@ -29,7 +34,13 @@ h1 {
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
-    height: 70%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    color: black;
+}
+
+form > * {
+    padding: 1rem
 }
 
 #gametype > *{
@@ -40,6 +51,8 @@ h1 {
     display: none 
 }
 
+
+/* Main container settings */
 #game-container {
     display: flex;
     width: 100%;
@@ -52,7 +65,7 @@ h1 {
     flex-direction: column;
     order: 1;
     align-items: center;
-    width: 10%;
+    width: 30%;
 }
 
 #player2-info {
@@ -60,7 +73,7 @@ h1 {
     flex-direction: column;
     order:3;
     align-items: center;
-    width: 10%;
+    width: 30%;
 }
 
 #player1-name, #player2-name {
@@ -77,18 +90,14 @@ h1 {
 	width: 570px;
 	height: 570px;
 	margin: 0;
-    background-color: #34495e;
-    color: #fff;
-    border: 6px solid #2c3e50;
+    background-color: rgba(0, 0, 0, 0);
     border-radius: 10px;
 	display: grid;
     grid-template: repeat(3, 1fr) / repeat(3, 1fr);
 }
 
-.box
-{
-  border: 6px solid #2c3e50;
-  border-radius: 2px;
+.box {
+  border: 5px solid antiquewhite;
   font-family: Helvetica;
   font-weight: bold;
   font-size: 4em;
@@ -96,8 +105,49 @@ h1 {
   justify-content: center;
   align-items: center;
   font-family: 'Schoolbell', cursive;
+  color: antiquewhite
 }
 
+
+/* Single cells settings */
+#b1 {
+    border-top: none;
+    border-left: none;
+}
+
+#b2 {
+    border-top: none;
+}
+
+#b3 {
+    border-top: none;
+    border-right: none;
+}
+
+#b4 {
+    border-left: none;
+}
+
+#b6 {
+    border-right: none;
+}
+
+#b7 {
+    border-left: none;
+    border-bottom: none;
+}
+
+#b8 {
+    border-bottom: none;
+}
+
+#b9 {
+    border-right: none;
+    border-bottom: none;
+}
+
+
+/* Buttons settings */
 #buttons-container {
     display: flex;
     justify-content: center;
@@ -105,8 +155,46 @@ h1 {
 
 #buttons-container > * {
     margin: 1em;
-    padding: 0.2em;
+    padding: 0.5em;
+    background-color: antiquewhite;
+    border: none;
+    border-radius: 3px;
 }
 
 
-/* colore e media queries editare i bottoni */
+/* Media Queries */
+@media (max-width:935px) {
+    h1 {
+        margin-bottom: 0;
+    }
+
+    #game-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #player1-info {
+        display: flex;
+        flex-direction: row;
+        order: 1;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #player2-info {
+        display: flex;
+        flex-direction: row;
+        order:2;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #gameboard-container {
+        order: 3;
+        padding: 1rem;
+        box-sizing: border-box;
+    }
+}
